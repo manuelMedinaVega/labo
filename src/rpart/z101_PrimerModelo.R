@@ -7,7 +7,10 @@ require("rpart")
 require("rpart.plot")
 
 #Aqui se debe poner la carpeta de la materia de SU computadora local
-setwd("D:\\gdrive\\UBA2022\\")  #Establezco el Working Directory
+setwd("C:\\Users\\manuel\\Documents\\m_d_m\\dmef")  #Establezco el Working Directory
+
+# Poner sus semillas
+semillas <- c(309367, 149521, 690467, 699191, 795931)
 
 #cargo el dataset
 dataset  <- fread("./datasets/competencia1_2022.csv")
