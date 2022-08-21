@@ -261,5 +261,31 @@ View(polyarea(x, y))
 
 
 ## Preguntas
-## -¿AUC es una métrica global o local? 
-## -¿Pueden dos curvas distintas tener un mismo valor de AUC?
+## -¿AUC es una métrica global o local? global, roc es local
+## -¿Pueden dos curvas distintas tener un mismo valor de AUC? sí
+
+## ---------------------------
+## Step 11: No limitarnos a la ROC
+## ---------------------------
+
+# Podemos construir una curva para el accuraccy
+hojasordenadas[, acc := ((tp + tn) / (tp + tn + fp + fn))]
+
+# Y graficarla
+ggplot(hojasordenadas, aes(x = p_evento, y = acc)) +
+  geom_line(lwd = 1)
+
+## Preguntas
+## - ¿Se ajusta esta curva a nuestra necesidad de negocio?
+## -¿Cuál es el threshold optimo según la curva de accuracy?
+## - Si hubiéramos elegido nuestro modelo usando el accuracy, ¿Cuanta plata
+##   hubiera ganado o perdido la empresa?
+## - ¿Es necesario que la salida del modelo sea un probabilidad para aplicar
+##   estos conceptos?
+
+## TAREA:
+## - Construya la curva correspondiente al F1 Score.
+## - La métrica F1, es criticado por dar un mismo peso a recall y al precision.
+##   Por esto mismo, a alguien se le ocurrió el F-Beta. Construya esta última
+##   para varios Betas.
+## - ¿Hay algún Beta que tenga un **punto de corte** similar al nuestro?
