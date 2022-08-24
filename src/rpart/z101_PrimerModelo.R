@@ -7,7 +7,8 @@ require("rpart")
 require("rpart.plot")
 
 #Aqui se debe poner la carpeta de la materia de SU computadora local
-setwd("C:\\Users\\manuel\\Documents\\m_d_m\\dmef")  #Establezco el Working Directory
+#setwd("C:\\Users\\manuel\\Documents\\m_d_m\\dmef")  #Establezco el Working Directory
+setwd("C:\\Users\\programadorweb4\\Documents\\m_d_m\\dmef")
 
 # Poner sus semillas
 semillas <- c(309367, 149521, 690467, 699191, 795931)
@@ -54,3 +55,4 @@ dir.create( "./exp/KA2001" )
 fwrite( dapply[ , list(numero_de_cliente, Predicted) ], #solo los campos para Kaggle
         file= "./exp/KA2001/K101_001.csv",
         sep=  "," )
+
