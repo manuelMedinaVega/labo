@@ -21,9 +21,9 @@ require("ggplot2")
 
 
 # Poner la carpeta de la materia de SU computadora local
-setwd("/home/aleb/dmeyf2022")
+setwd("C:\\Users\\manuel\\Documents\\m_d_m\\dmef")
 # Poner sus semillas
-semillas <- c(17, 19, 23, 29, 31)
+semillas <- c(309367, 149521, 690467, 699191, 795931)
 
 # Cargamos el dataset
 dataset <- fread("./datasets/competencia1_2022.csv")

@@ -16,9 +16,9 @@ require("ggplot2")
 
 
 # Poner la carpeta de la materia de SU computadora local
-setwd("/home/aleb/dmeyf2022")
+setwd("C:\\Users\\manuel\\Documents\\m_d_m\\dmef")
 # Poner sus semillas
-semillas <- c(17, 19, 23, 29, 31)
+semillas <- c(309367, 149521, 690467, 699191, 795931)
 
 # Cargamos el dataset
 dataset <- fread("./datasets/competencia1_2022.csv")
@@ -33,13 +33,35 @@ arbol <- rpart(formula =    "clase_ternaria ~ .",
                  minbucket = 1,
                  maxdepth =  4)
 
+#xval: number of cross-validations.
+
+#cp: complexity parameter. Any split that does not decrease the overall lack of fit by a factor of cp 
+  #is not attempted. The main role of this parameter is to save computing time by pruning off splits 
+  #that are obviously not worthwhile. Essentially, the user informs the program that any split which 
+  #does not improve the fit by cp will likely be pruned off by cross-validation, and that hence the 
+  #program need not pursue it.
+
+#minsplit: the minimum number of observations that must exist in a node in order for a split to be attempted
+
+#minbucket: the minimum number of observations in any terminal node. If only one of minbucket or minsplit is 
+  #specified, the code either sets minsplit to minbucket*3 or minbucket to minsplit/3, as appropriate.
+  #o sea que pone siempre el minsplit como el triple del minbucket
+
+#maxdepth: Set the maximum depth of any node of the final tree, with the root node counted as depth 0.
+
+#control: optional parameters for controlling tree growth. For example: 
+  #control=rpart.control(minsplit=30, cp=0.001)
+  #requires that the minimun number of observations in a node be 30 before attempting a split and that
+  #a split must decrease the overall lack of fit by a factor of 0.001 (cost complexity factor) before
+  #being attempted
+
 print(arbol)
 
 ## Preguntas
 ## Usualmente se suele cortar las variables en 2 intervalos
-## - ¿Se podría cortar en más intervalos?
-## - ¿Cuál sería el costo?
-## - ¿Se obtendrían mejores resultados?
+## - ¿Se podría cortar en más intervalos?, sí
+## - ¿Cuál sería el costo?, es más complejo, se requiere mayor procesamiento
+## - ¿Se obtendrían mejores resultados?, sí, pero igual que al tener más profundidad
 ##
 ## Una de las muchas ventajas que tienen los árboles es la simpleza que tienen
 ## para ser implementados en fácilmente en sistemas productivos, dado que la
@@ -88,11 +110,13 @@ tablahojas <- function(arbol, datos, target = "clase_ternaria") {
 # Ejecutamos la función sobre nuestro modelo, con nuestros datos
 hojas <- tablahojas(arbol, dtrain)
 print(hojas)
+print(hojas)
+sum(hojas[,TOTAL])
 
 ## Preguntas
 ## - ¿Con qué criterio eligió la clase de cada hoja que determino la
-##   clasificación de los registros?
-## - ¿Cuántas hojas con BAJAS+2 hay?
+##   clasificación de los registros? la clase con mayor número de observaciones
+## - ¿Cuántas hojas con BAJAS+2 hay? 0
 
 ## ---------------------------
 ## Step 3: Calculando la ganancia de cada hoja
@@ -100,7 +124,6 @@ print(hojas)
 
 # Agregamos un nuevo campo de nombre ganancia
 hojas[, ganancia := `BAJA+2` * 78000 - 2000 * (CONTINUA + `BAJA+1`)]
-print(hojas)
 
 ## Pregunta
 ## - ¿Cuantás hojas que no son BAJA+2 tienen aún así ganancia positiva?
@@ -116,9 +139,9 @@ print(hojas[ganancia > 0, .(
 
 ## Preguntas
 ## Si enviaramos todos los casos de las hojas con ganancia positiva
-## - ¿Cuánta ganancia tendríamos?
-## - ¿Cuánta personas estimularíamos?
-## - ¿A cuántas personas acertaríamos?
+## - ¿Cuánta ganancia tendríamos? 18912000
+## - ¿Cuánta personas estimularíamos? 9904
+## - ¿A cuántas personas acertaríamos? 484
 
 
 ## ---------------------------
@@ -152,7 +175,7 @@ print(hojasbinario[ganancia > 0,
  .(ganancia = sum(ganancia), enviados = sum(TOTAL), sevan = sum(evento))])
 
 ## Pregunta
-## - ¿Considera que la agrupación de clases fue positiva para la  ganancia?
+## - ¿Considera que la agrupación de clases fue positiva para la  ganancia? sí, aumentó
 
 ## ---------------------------
 ## Step 6: Salida probabilísticas
@@ -173,14 +196,15 @@ print(hojasordenadas)
 
 # TAREAS:
 # - Calculé la probabilidad de NO evento
+hojasbinario[, p_no_evento := noevento / (evento + noevento)]
 # - Puede pasar que dos hojas tengan la misma probabilidad, escriba una query 
 #   que las agrupe.
 
 ## Preguntas
 ## - ¿Cómo ve la relación entre la probabilidad ordenada y la hojas con
-##   ganancia?
-## - ¿Cuál es la máxima ganancia posible es nuestro árbol?
-## - ¿Cuál es el `punto de corte` que sugiere?
+##   ganancia?, a partir de p-evento = 0.028, se obtienen ganancias positivas
+## - ¿Cuál es la máxima ganancia posible es nuestro árbol?, 20656000
+## - ¿Cuál es el `punto de corte` que sugiere?, p-evento = 0.028
 ## - ¿Por qué es distinto al teórico?
 ## - ¿Es nuestro `punto de corte` es igual de útil?
 
@@ -241,7 +265,7 @@ ggplot(hojasordenadas, aes(x = fpr, y = tpr)) +
   geom_line(lwd = 1)
 
 ## Pregunta
-## ¿Qué representa la curva ROC?
+## ¿Qué representa la curva ROC?, cuanto tolero los errores, cuanto puede llegar a fallar un test
 
 ## ---------------------------
 ## Step 10: Calculando el área bajo la curva
@@ -262,8 +286,8 @@ print(polyarea(x, y))
 
 
 ## Preguntas
-## -¿AUC es una métrica global o local?
-## -¿Pueden dos curvas distintas tener un mismo valor de AUC?
+## -¿AUC es una métrica global o local?, global, roc es local
+## -¿Pueden dos curvas distintas tener un mismo valor de AUC? sí
 
 ## ---------------------------
 ## Step 11: No limitarnos a la ROC

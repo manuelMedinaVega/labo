@@ -24,9 +24,9 @@ require("DiceKriging")
 require("mlrMBO")
 
 # Poner la carpeta de la materia de SU computadora local
-setwd("/home/aleb/dmeyf2022")
+setwd("C:\\Users\\manuel\\Documents\\m_d_m\\dmef")
 # Poner sus semillas
-semillas <- c(17, 19, 23, 29, 31)
+semillas <- c(309367, 149521, 690467, 699191, 795931)
 
 # Cargamos el dataset
 dataset <- fread("./datasets/competencia1_2022.csv")
@@ -103,7 +103,7 @@ n_seeds <- 5
 # Estimación de cuanto tardaría en buscar el mejor modelo con 2 parámetros.
 print(seconds_to_period(n_md * n_ms * n_seeds * model_time))
 
-# Tamaño del espacio de búsqueda de *minsplit*
+# Tamaño del espacio de búsqueda de *minbucket*
 n_mb <- 100 - 2
 
 # Estimación de cuanto tardaría en buscar el mejor modelo con 3 parámetros.
@@ -172,8 +172,10 @@ table(dataset[ds_sample]$clase_binaria)
 ## - ¿Hay mejores formas de muestrear?
 ## - ¿Es bueno muestrear?
 ## - ¿Qué efectos en las métricas va a producir el muestreo?
-## - ¿Por qué se eligió usar el AUC?
-## - ¿Qué hay que cambiar en la función de ganancia para poder utilizarla?
+## - ¿Por qué se eligió usar el AUC?, porque no se ve afectada por el balanceo de los datos
+## - ¿Qué hay que cambiar en la función de ganancia para poder utilizarla?, los no eventos deben tener más peso
+  #los no eventos deben valer 160 veces lo que valen
+  #la ganancia va a sobrestimar a los no eventos
 
 ## ---------------------------
 ## Step 6: Comparando tiempos con o sin muestras
@@ -388,3 +390,50 @@ print(run_md_ms)
 ## Agregue todos los parámetros que considere. Una vez que tenga sus mejores
 ## parámetros, haga una copia del script rpart/z101_PrimerModelo.R, cambie los
 ## parámetros dentro del script, ejecutelo y suba a Kaggle su modelo.
+
+## ---------------------------
+## Step 10: Buscando con una Opt. Bayesiana para 2 parámetros
+## ---------------------------
+
+set.seed(semillas[1])
+obj_fun_md_ms <- function(x) {
+  experimento_rpart(dataset, semillas
+                    , md = x$maxdepth
+                    , ms = x$minsplit
+                    , mb = floor(x$minsplit * x$minbucket))
+}
+#minbucket debería ser menor a minsplit
+
+obj_fun <- makeSingleObjectiveFunction(
+  minimize = FALSE,
+  fn = obj_fun_md_ms,
+  par.set = makeParamSet(
+    makeIntegerParam("maxdepth",  lower = 4L, upper = 20L),
+    makeIntegerParam("minsplit",  lower = 1L, upper = 200L),
+    makeNumericParam("minbucket", lower = 0L, upper = 1L) 
+  ),
+  noisy = TRUE,
+  has.simple.signature = FALSE
+)
+
+ctrl <- makeMBOControl()
+ctrl <- setMBOControlTermination(ctrl, iters = 30L)
+ctrl <- setMBOControlInfill(
+  ctrl,
+  crit = makeMBOInfillCritEI(),
+  opt = "focussearch",
+  # sacar parámetro opt.focussearch.points en próximas ejecuciones
+  # opt.focussearch.points = 20
+)
+
+lrn <- makeMBOLearner(ctrl, obj_fun)
+
+surr_km <- makeLearner("regr.km", predict.type = "se", covtype = "matern3_2")
+
+run_md_ms <- mbo(obj_fun, learner = surr_km, control = ctrl, )
+print(run_md_ms)
+
+
+#experimento_rpart, sin hacer muestreo, sino con todos los datos
+#cp es al pedo, poner -1 con los demás parametros basta
+#cambiar auc, para que sea ganancia, ya no auc
