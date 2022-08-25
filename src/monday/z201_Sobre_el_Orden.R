@@ -16,7 +16,8 @@ require("ggplot2")
 
 
 # Poner la carpeta de la materia de SU computadora local
-setwd("C:\\Users\\manuel\\Documents\\m_d_m\\dmef")
+setwd(gsub(" ", "", paste(gsub('/', '\\\\', getwd()), "\\m_d_m\\dmef")))
+
 # Poner sus semillas
 semillas <- c(309367, 149521, 690467, 699191, 795931)
 
@@ -33,21 +34,23 @@ arbol <- rpart(formula =    "clase_ternaria ~ .",
                  minbucket = 1,
                  maxdepth =  4)
 
-#xval: number of cross-validations.
+#xval: number of cross-validations. (default: 10)
 
 #cp: complexity parameter. Any split that does not decrease the overall lack of fit by a factor of cp 
   #is not attempted. The main role of this parameter is to save computing time by pruning off splits 
   #that are obviously not worthwhile. Essentially, the user informs the program that any split which 
   #does not improve the fit by cp will likely be pruned off by cross-validation, and that hence the 
-  #program need not pursue it.
+  #program need not pursue it. (default: 0.01)
 
-#minsplit: the minimum number of observations that must exist in a node in order for a split to be attempted
+#minsplit: the minimum number of observations that must exist in a node in order for a split to be 
+  #attempted. (default: 20)
 
 #minbucket: the minimum number of observations in any terminal node. If only one of minbucket or minsplit is 
   #specified, the code either sets minsplit to minbucket*3 or minbucket to minsplit/3, as appropriate.
-  #o sea que pone siempre el minsplit como el triple del minbucket
+  #o sea que pone siempre el minsplit como el triple del minbucket. (default: round(minsplit/3))
 
-#maxdepth: Set the maximum depth of any node of the final tree, with the root node counted as depth 0.
+#maxdepth: Set the maximum depth of any node of the final tree, with the root node counted as depth 0. 
+  #(default: 30)
 
 #control: optional parameters for controlling tree growth. For example: 
   #control=rpart.control(minsplit=30, cp=0.001)
@@ -109,7 +112,6 @@ tablahojas <- function(arbol, datos, target = "clase_ternaria") {
 
 # Ejecutamos la función sobre nuestro modelo, con nuestros datos
 hojas <- tablahojas(arbol, dtrain)
-print(hojas)
 print(hojas)
 sum(hojas[,TOTAL])
 
