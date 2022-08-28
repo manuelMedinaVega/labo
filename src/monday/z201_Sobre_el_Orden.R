@@ -16,7 +16,7 @@ require("ggplot2")
 
 
 # Poner la carpeta de la materia de SU computadora local
-setwd(gsub(" ", "", paste(gsub('/', '\\\\', getwd()), "\\m_d_m\\dmef")))
+setwd(gsub(" ", "", paste(gsub('/', '\\\\', gsub("/m_d_m/dmef", "", getwd())), "\\m_d_m\\dmef")))
 
 # Poner sus semillas
 semillas <- c(309367, 149521, 690467, 699191, 795931)

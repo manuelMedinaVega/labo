@@ -5,7 +5,7 @@ require("data.table")
 require("rpart")
 require("parallel")
 
-ksemillas  <- c(102191, 200177, 410551, 552581, 892237 ) #reemplazar por las propias semillas
+ksemillas <- c(309367, 149521, 690467, 699191, 795931) #reemplazar por las propias semillas
 
 #------------------------------------------------------------------------------
 #particionar agrega una columna llamada fold a un dataset que consiste en una particion estratificada segun agrupa
@@ -61,7 +61,7 @@ ArbolEstimarGanancia  <- function( semilla, param_basicos )
 #------------------------------------------------------------------------------
 
 #Aqui se debe poner la carpeta de la computadora local
-setwd("D:\\gdrive\\UBA2022\\")   #Establezco el Working Directory
+setwd(gsub(" ", "", paste(gsub('/', '\\\\', gsub("/m_d_m/dmef", "", getwd())), "\\m_d_m\\dmef")))  #Establezco el Working Directory
 #cargo los datos
 
 #cargo los datos
@@ -77,7 +77,7 @@ param_basicos  <- list( "cp"=         -0.5,  #complejidad minima
                         "maxdepth"=  5 ) #profundidad máxima del arbol
 
 #Un solo llamado, con la semilla 17
-ArbolEstimarGanancia( 17, param_basicos )   
+ArbolEstimarGanancia( 309367, param_basicos )   
 
 
 #la funcion mcmapply  llama a la funcion ArbolEstimarGanancia  tantas veces como valores tenga el vector  ksemillas

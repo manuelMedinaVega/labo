@@ -66,7 +66,7 @@ ArbolesMontecarlo  <- function( semillas,  param_basicos )
                           semillas,   #paso el vector de semillas, que debe ser el primer parametro de la funcion ArbolEstimarGanancia
                           MoreArgs= list( param_basicos),  #aqui paso el segundo parametro
                           SIMPLIFY= FALSE,
-                          mc.cores= 16 )  #se puede subir a 5 si posee Linux o Mac OS
+                          mc.cores= 1 )  #se puede subir a 5 si posee Linux o Mac OS
 
   #media de las ganancias
   return(  unlist(ganancias) )
@@ -75,11 +75,11 @@ ArbolesMontecarlo  <- function( semillas,  param_basicos )
 #------------------------------------------------------------------------------
 
 #Aqui se debe poner la carpeta de la computadora local
-setwd("~/buckets/b1/")   #Establezco el Working Directory
+setwd(gsub(" ", "", paste(gsub('/', '\\\\', gsub("/m_d_m/dmef", "", getwd())), "\\m_d_m\\dmef")))   #Establezco el Working Directory
 #cargo los datos
 
 #cargo los datos
-dataset  <- fread("./datasetsOri/uba/competencia1_2022.csv")
+dataset  <- fread("./datasets/competencia1_2022.csv")
 
 #trabajo solo con los datos con clase, es decir 202101
 dataset  <- dataset[ clase_ternaria!= "" ]
@@ -106,7 +106,7 @@ paramC  <- list( "cp"=         -1,  #complejidad minima
 
 #creo un vector con 100 numeros primos tomados al azar del intervalo [ 100k, 1M ]
 kcantidad_semillas <- 100   #cantidad de semillas con las que voy a trabajar
-set.seed( 17 )               #seteo inicial para replicabilidad
+set.seed( 309367 )               #seteo inicial para replicabilidad
 
 primos  <- generate_primes(min=100000, max=1000000)   #genero TODOS los numeros primos entre 100k y 1M
 vsemillas  <- sample(primos)[ 1:kcantidad_semillas ]  #me quedo con kcantidad_semillas primos al azar

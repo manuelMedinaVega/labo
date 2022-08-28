@@ -21,7 +21,8 @@ particionar  <- function( data,  division, agrupa="",  campo="fold", start=1, se
 #------------------------------------------------------------------------------
 
 #Aqui se debe poner la carpeta de la computadora local
-setwd("D:\\gdrive\\UBA2022\\")   #Establezco el Working Directory
+
+setwd(gsub(" ", "", paste(gsub('/', '\\\\', gsub("/m_d_m/dmef", "", getwd())), "\\m_d_m\\dmef")))
 
 #cargo los datos
 dataset  <- fread("./datasets/competencia1_2022.csv")
@@ -31,7 +32,7 @@ dataset  <- dataset[ clase_ternaria!= "" ]
 
 #particiono estratificadamente el dataset
 #Cambiar por la primer semilla de cada uno !
-particionar( dataset, division=c(7,3), agrupa="clase_ternaria", seed= 102191 )  #Cambiar por la primer semilla de cada uno !
+particionar( dataset, division=c(7,3), agrupa="clase_ternaria", seed= 309367 )  #Cambiar por la primer semilla de cada uno !
 
 
 param_basicos  <- list( "cp"=         0,  #complejidad minima
