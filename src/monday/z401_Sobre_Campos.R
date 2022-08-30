@@ -19,9 +19,10 @@ require("ggplot2")
 require("dplyr")
 
 # Poner la carpeta de la materia de SU computadora local
-setwd("/home/aleb/dmeyf2022")
+setwd(gsub(" ", "", paste(gsub('/', '\\\\', gsub("/m_d_m/dmef", "", getwd())), "\\m_d_m\\dmef")))
+
 # Poner sus semillas
-semillas <- c(17, 19, 23, 29, 31)
+semillas <- c(309367, 149521, 690467, 699191, 795931)
 
 # Cargamos el dataset
 dataset <- fread("./datasets/competencia1_2022.csv")
@@ -65,16 +66,16 @@ modelo <- rpart(clase_binaria ~ .,
                 cp = -1,
                 minsplit = 20,
                 minbucket = 10,
-                maxdepth = 5)
+                maxdepth = 7)
 
 calcular_ganancia(modelo, dtest)
 
 print(modelo$variable.importance)
 
-
 ## Preguntas
-## - ¿Cuáles son las variables más importantes para el modelo?
-## - ¿Cómo calcula RPART la importancia de una variable?
+## - ¿Cuáles son las variables más importantes para el modelo?: ctrx_quarter, active_quarter, ccomisiones_otras, ... , numero_de_cliente(indica antiguedad)
+  ##numero_de_cliente se debe quitar, cuando se se agregan más fechas, porque puede empezar a memorizar
+## - ¿Cómo calcula RPART la importancia de una variable? numero de cortes posibles o que se hicieron con las variables, o suma de la ganancia que fue teniendo una variable
 ## - ¿Es la única forma de calcular la importancia de una variable?
 
 ## ---------------------------
@@ -87,8 +88,8 @@ print(modelo$variable.importance)
 summary(modelo)
 
 ## Preguntas
-## - ¿Cómo operó con la variable nula?
-## - ¿Hace falta imputar las variables para que el árbol abra?
+## - ¿Cómo operó con la variable nula? con variables subrogadas, variables parecidas, se comportan parecido, que cortan igual
+## - ¿Hace falta imputar las variables para que el árbol abra? no es imprecindible
 
 ## ---------------------------
 ## Step 3: Datos nulos - Metiendo mano
@@ -156,9 +157,10 @@ modelo3 <- rpart(clase_binaria ~ . - Visa_fechaalta - Visa_fechaalta_2,
 
 print(modelo3$variable.importance)
 calcular_ganancia(modelo3, dtest)
+#dtrain$Visa_fechaalta
 
 ## Preguntas
-## - ¿Son muchos los casos nulos?
+## - ¿Son muchos los casos nulos? 5000 de 160000, poco
 ## - En mi caso aparenta una mejora, con más casos cree que esa mejora se
 ##   mantendría 
 ## - ¿Existe otro valor mejor que la media para imputar?
@@ -179,6 +181,16 @@ experimento <- function() {
         train  <-  dataset[in_training, ]
         test   <-  dataset[-in_training, ]
 
+        mean_Visa_fechaalta <- mean(train$Visa_fechaalta, na.rm = T)
+        # Imputamos los nulos de nuestra variable con la media
+        train[, Visa_fechaalta_3 := ifelse(is.na(Visa_fechaalta), 
+                                            mean_Visa_fechaalta,
+                                            Visa_fechaalta)] 
+        
+        test[, Visa_fechaalta_3 := ifelse(is.na(Visa_fechaalta), 
+                                           mean_Visa_fechaalta,
+                                           Visa_fechaalta)]  
+        
         r <- rpart(clase_binaria ~ .,
                     data = train,
                     xval = 0,
@@ -192,6 +204,7 @@ experimento <- function() {
     mean(gan)
 }
 
+experimento()
 # Veamos la 
 ## Preguntas
 ## - ¿Qué sucede si una transformación que depende del dataset no se aplica de
@@ -207,7 +220,7 @@ cor(dtrain$Visa_fechaalta_2,dtrain$Visa_fechaalta_3)
 
 # Varios modelos en los que entren dos variables muy correlacionadas se 
 # romperían. Veamos que pasa con los árboles
-
+# los árboles aguantan la correlación, ya que separan por una y esa es la misma separación de la otra y no le afecta la correlación
 modelo4 <- rpart(clase_binaria ~ . ,
                 data = dtrain,
                 xval = 0,
@@ -232,7 +245,7 @@ ggplot(dtrain, aes(x=ctrx_quarter)) + geom_boxplot()
 quantile(dtrain$ctrx_quarter, probs = c(0,0.5, 0.75, 0.9, 0.95, 0.99, 1))
 
 ## Preguntas
-## - ¿Qué tan frecuentes considera estas dispersiones en los datasets?
+## - ¿Qué tan frecuentes considera estas dispersiones en los datasets? muy común, en estos casos son usados más los árboles
 
 ## ---------------------------
 ## Step 6: Outliers - Luchando 
@@ -243,6 +256,7 @@ dtrain[, ctrx_quarter_2 := log(ctrx_quarter + 1)]
 dtest[, ctrx_quarter_2 := log(ctrx_quarter + 1)]
 
 quantile(dtrain$ctrx_quarter_2, probs = c(0,0.5, 0.75, 0.9, 0.95, 0.99, 1))
+#la media tiene un valor de 104
 
 # Comparemos dos splits
 modelo_cq_1 <- rpart(clase_binaria ~ ctrx_quarter,
@@ -261,7 +275,8 @@ print(modelo_cq_2)
 
 ## Preguntas
 ## - Mirando los puntos de corte de los dos modelos ¿Existe una relación
-##   matermática entre ellos?
+##   matermática entre ellos? el segundo punto de corte es el logaritmo del primero
+##   a los árboles les importa el orden, no mucho la escala
 ## - ¿Es útil una transformación monótona en los árboles de decisión?
 
 ## ---------------------------
@@ -297,12 +312,20 @@ mis_variables <- c("ctrx_quarter",
                     "mcuenta_corriente")
 
 # A todas las vamos a rankear
+# rankear: binear con el percentil, sirve para la eficiencia del arbol, tiene menos cortes
+# predice mejor, se pierde granularidad, evita el overfit, además los valores pueden ir cambiando,
+# y pueden variar los puntos de corte
+# no tiene sentido rankear todas las variables, por ejemplo creditos hipotecarios, que tiene valores como 3 o 4
+# revisar que los datos de marzo, sean parecidos a los de enero
+# en arboles las variables más importantes, deben abrir igual en ambos datos
+# no todas las variables tendrían que tener el mismo bind
 
 prefix <- "r_"
 for (var in mis_variables) {
     dtrain[, (paste(prefix, var, sep = "")) := ntile(get(var), 10)]
     dtest[, (paste(prefix, var, sep = "")) := ntile(get(var), 10)]
 }
+#ntile: decilado
 
 ## ---------------------------
 ## Step 9: Un + poco de R, seleccionar las variables para modelar 
@@ -372,5 +395,8 @@ print(modelo6$variable.importance)
 ## - Feature engineering correctamente aplicado
 ## - Opt Bayesiana para el dataset que se incluya nuevas variables
 ## - Scorear en los datos de marzo y subir a kaggle el score.
+
+#saldo en tarjetas, cantida de tarjetas, fecha cierre - vencimiento
+#los limites de tarjeta no se actualiza muchas veces cuando debe
 
 
