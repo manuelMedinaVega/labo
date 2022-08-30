@@ -398,5 +398,7 @@ print(modelo6$variable.importance)
 
 #saldo en tarjetas, cantida de tarjetas, fecha cierre - vencimiento
 #los limites de tarjeta no se actualiza muchas veces cuando debe
+#las 2 variables, cuando las proyecto, esa variable queda más ordenada
+#limite total de la tarjeta y lo consumido
 
 
