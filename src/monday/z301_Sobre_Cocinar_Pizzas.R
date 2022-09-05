@@ -486,13 +486,13 @@ obj_fun <- makeSingleObjectiveFunction(
 )
 
 ctrl <- makeMBOControl()
-ctrl <- setMBOControlTermination(ctrl, iters = 30L)
+ctrl <- setMBOControlTermination(ctrl, iters = 200L)
 ctrl <- setMBOControlInfill(
   ctrl,
   crit = makeMBOInfillCritEI(),
   opt = "focussearch",
   # sacar parámetro opt.focussearch.points en próximas ejecuciones
-  opt.focussearch.points = 20
+  #opt.focussearch.points = 20
 )
 
 lrn <- makeMBOLearner(ctrl, obj_fun)

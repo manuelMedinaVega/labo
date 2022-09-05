@@ -86,7 +86,7 @@ print(modelo$variable.importance)
 # tenga missing.
 
 summary(modelo)
-
+count(dtrain[ctrx_quarter < 9.5 & mpasivos_margen < 6.125])
 ## Preguntas
 ## - ¿Cómo operó con la variable nula? con variables subrogadas, variables parecidas, se comportan parecido, que cortan igual
 ## - ¿Hace falta imputar las variables para que el árbol abra? no es imprecindible
@@ -94,7 +94,7 @@ summary(modelo)
 ## ---------------------------
 ## Step 3: Datos nulos - Metiendo mano
 ## ---------------------------
-
+dtrain$Visa_fechaalta
 # Numero de nulos en variable Visa_fechaalta
 print(sum(is.na(dtrain$Visa_fechaalta)))
 
@@ -120,6 +120,8 @@ modelo2 <- rpart(clase_binaria ~ . - Visa_fechaalta,
                 maxdepth = 5)
 
 print(modelo2$variable.importance)
+print(modelo$variable.importance["Visa_fechaalta"])
+print(modelo2$variable.importance["Visa_fechaalta_2"])
 
 # Para calcular la ganancia hay que agregar la variable a test
 dtest[, Visa_fechaalta_2 := ifelse(is.na(Visa_fechaalta), 
@@ -127,10 +129,11 @@ dtest[, Visa_fechaalta_2 := ifelse(is.na(Visa_fechaalta),
             Visa_fechaalta)] 
 
 calcular_ganancia(modelo2, dtest)
+calcular_ganancia(modelo, dtest)
 
 ## Preguntas
 ## - ¿Desde el punto de vista de la importancia de variable, después que se 
-##   imputo, pasó a ser más o menos importante?
+##   imputo, pasó a ser más o menos importante? más importante
 
 ## ---------------------------
 ## Step 4: Datos nulos - Metiendo mano, una vez más
@@ -156,7 +159,10 @@ modelo3 <- rpart(clase_binaria ~ . - Visa_fechaalta - Visa_fechaalta_2,
                 maxdepth = 5)
 
 print(modelo3$variable.importance)
+print(modelo3$variable.importance['Visa_fechaalta_3'])
+print(modelo2$variable.importance['Visa_fechaalta_2'])
 calcular_ganancia(modelo3, dtest)
+calcular_ganancia(modelo2, dtest)
 #dtrain$Visa_fechaalta
 
 ## Preguntas
@@ -169,7 +175,7 @@ calcular_ganancia(modelo3, dtest)
 ## Step 5: Datos nulos - Midiendo bien
 ## ---------------------------
 
-## Actividad para medir bien la influencia de la media en de esa variable, 
+## Actividad para medir bien la influencia de la media en esa variable, 
 ## escriba una función de experimento que refleje la transformación  
 
 experimento <- function() {

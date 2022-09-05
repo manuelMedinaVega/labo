@@ -24,7 +24,7 @@ modelo  <- rpart(formula=   "clase_ternaria ~ .",  #quiero predecir clase_ternar
                  xval=      0,
                  cp=       -1,   #esto significa no limitar la complejidad de los splits
                  minsplit=  200,     #minima cantidad de registros para que se haga el split
-                 minbucket= 42,     #tamaño minimo de una hoja
+                 minbucket= 45,     #tamaño minimo de una hoja
                  maxdepth=  5 )    #profundidad maxima del arbol
 
 
