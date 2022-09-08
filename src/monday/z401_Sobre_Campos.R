@@ -97,6 +97,7 @@ count(dtrain[ctrx_quarter < 9.5 & mpasivos_margen < 6.125])
 dtrain$Visa_fechaalta
 # Numero de nulos en variable Visa_fechaalta
 print(sum(is.na(dtrain$Visa_fechaalta)))
+print(sum(is.na(dtrain$Master_fechaalta)))
 
 # Imputamos los nulos de nuestra variable con ceros
 dtrain[, Visa_fechaalta_2 := ifelse(is.na(Visa_fechaalta), 
@@ -246,6 +247,7 @@ calcular_ganancia(modelo4, dtest)
 
 # Veamos el boxplot de una variable muy importante según nuestro árbol
 ggplot(dtrain, aes(x=ctrx_quarter)) + geom_boxplot()
+summary(dtrain$ctrx_quarter)
 
 # Vemos la distribución de los deciles
 quantile(dtrain$ctrx_quarter, probs = c(0,0.5, 0.75, 0.9, 0.95, 0.99, 1))
@@ -291,6 +293,10 @@ print(modelo_cq_2)
 
 dtrain[, r_ctrx_quarter := ntile(ctrx_quarter, 10)]
 dtest[, r_ctrx_quarter := ntile(ctrx_quarter, 10)]
+
+summary(dtrain$r_ctrx_quarter)
+dtrain$r_ctrx_quarter
+
 
 modelo_cq_4 <- rpart(clase_binaria ~ . - ctrx_quarter - ctrx_quarter_2 - Visa_fechaalta_2 - Visa_fechaalta_3,
                     data = dtrain,
@@ -360,6 +366,7 @@ modelo5 <- rpart(formula,
                     maxdepth = 5)
 
 print(modelo5$variable.importance)
+calcular_ganancia(modelo5, dtest)
 
 ## ---------------------------
 ## Step 10: Embeddings (Caseros)
