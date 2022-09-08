@@ -21,9 +21,10 @@ require("treeClust")
 require("ggplot2")
 
 # Poner la carpeta de la materia de SU computadora local
-setwd("/home/aleb/dmeyf2022")
+setwd(gsub(" ", "", paste(gsub('/', '\\\\', gsub("/m_d_m/dmef", "", getwd())), "\\m_d_m\\dmef")))
+
 # Poner sus semillas
-semillas <- c(17, 19, 23, 29, 31)
+semillas <- c(309367, 149521, 690467, 699191, 795931)
 
 # Cargamos el dataset
 dataset <- fread("./datasets/competencia1_2022.csv")
@@ -56,6 +57,9 @@ ggplot(dataset[mcuentas_saldo > 0 &
                 mcuentas_saldo < 10000, ], aes(x = mcuentas_saldo)) +
   facet_grid(clase_ternaria ~ .) +
   geom_histogram()
+
+#se parecen mucho los tipos baja+1 y baja+2
+#cuando el arbol abre no diferencia entre esas 2 clases
 
 ## Preguntas
 ## ¿Cómo funciona una árbol de decisión?
@@ -106,6 +110,7 @@ print(sum(
                     -2000) / 0.3
     )
 )
+#se modifica el punto de corte
 
 ## Preguntas
 ## ¿Obtuvo una importante mejora en su modelo?
@@ -162,7 +167,7 @@ train_bin2 <- leaves_table(modelo_bin2, dtrain, "clase_binaria2")
 print(train_bin2)
 
 ## Preguntas
-## ¿Sigue siendo el punto de corte optimo 0.025?
+## ¿Sigue siendo el punto de corte optimo 0.025? 0.05
 ## ¿Dejamos plata sobre la mesa?
 
 ## ---------------------------
@@ -190,7 +195,7 @@ train_bin2[pos_max_gan, n_acum / 0.7]
 
 ## Preguntas
 ## ¿Es útil con su semilla este mezcla de clases?
-## ¿Qué desafíos ve en este punto?
+## ¿Qué desafíos ve en este punto? elegir el punto adecuado de corte
 
 ## ---------------------------
 ## Off topic: Si jugamos con clases, jugemos en serio
@@ -274,6 +279,9 @@ for (s in semillas) {
                 "te_gan_acum", "te_n_acum")])
 
 }
+
+#tener cuidado con el punto de corte, al unir clases
+#el punto de corte se podría considerar como un nuevo parámetro y se podría parametrizar
 
 ## Agregue estadísticos para tomar una mejor decisión.
 

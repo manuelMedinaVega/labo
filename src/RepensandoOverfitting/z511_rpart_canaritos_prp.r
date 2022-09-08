@@ -6,7 +6,8 @@ require("data.table")
 require("rpart")
 require("rpart.plot")
 
-setwd("." )  #establezco la carpeta donde voy a trabajar
+#setwd("." )  #establezco la carpeta donde voy a trabajar
+setwd(gsub(" ", "", paste(gsub('/', '\\\\', gsub("/m_d_m/dmef", "", getwd())), "\\m_d_m\\dmef")))
 #cargo el dataset
 dataset  <- fread( "./datasets/competencia1_2022.csv")
 
