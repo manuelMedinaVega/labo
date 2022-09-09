@@ -43,8 +43,6 @@ ganancia <- function(probabilidades, clase) {
 
 modelo_rpart <- function(train, test, cp =  0, ms = 20, mb = 1, md = 10) {
   modelo <- rpart(clase_binaria ~ ., data = train,
-                  parms=list(
-                    loss=matrix(c(0,1,39,0), byrow = TRUE, nrow = 2)),
                   xval = 0,
                   cp = cp,
                   minsplit = ms,
@@ -106,3 +104,9 @@ surr_km <- makeLearner("regr.km", predict.type = "se", covtype = "matern3_2")
 
 run_md_ms_mb <- mbo(obj_fun, learner = surr_km, control = ctrl, )
 print(run_md_ms_mb)
+
+#mejores hiperparámetros
+#maxdepth: 19
+#minsplit: 846
+#minbucket: 0.76 -> 643
+#ganancia: 18682667
