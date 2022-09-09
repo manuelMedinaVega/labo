@@ -69,8 +69,9 @@ modelo <- rpart(clase_binaria ~ .,
                 maxdepth = 7)
 
 calcular_ganancia(modelo, dtest)
-
+#ganancia: 18720000
 print(modelo$variable.importance)
+#ctrx_quarter, active_quarter, cliente_antiguedad, mpasivos_margen, mcuentas_saldo, mrentabilidad_annual
 
 ## Preguntas
 ## - ¿Cuáles son las variables más importantes para el modelo?: ctrx_quarter, active_quarter, ccomisiones_otras, ... , numero_de_cliente(indica antiguedad)
