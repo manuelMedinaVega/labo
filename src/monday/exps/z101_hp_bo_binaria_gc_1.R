@@ -1,6 +1,10 @@
 #Arbol elemental con libreria  rpart
 #Debe tener instaladas las librerias  data.table  ,  rpart  y  rpart.plot
 
+# Limpiamos el entorno
+rm(list = ls())
+gc(verbose = FALSE)
+
 #cargo las librerias que necesito
 require("data.table")
 require("rpart")
@@ -15,16 +19,29 @@ semillas <- c(309367, 149521, 690467, 699191, 795931)
 #cargo el dataset
 dataset  <- fread("./datasets/competencia1_2022.csv")
 
+dataset[, clase_binaria := ifelse(
+  clase_ternaria == "BAJA+2",
+  "evento",
+  "noevento"
+)]
+
+dataset[, clase_ternaria := NULL]
+
 dtrain  <- dataset[ foto_mes==202101 ]  #defino donde voy a entrenar
 dapply  <- dataset[ foto_mes==202103 ]  #defino donde voy a aplicar el modelo
 
+
 #genero el modelo,  aqui se construye el arbol
-modelo  <- rpart(formula=   "clase_ternaria ~ .",  #quiero predecir clase_ternaria a partir de el resto de las variables
+#hiperparámetros obtenidos con optimización bayeasiana para target binario, en google cloud
+#siguiendo z301
+modelo  <- rpart(formula=   "clase_binaria ~ .",  #quiero predecir clase_ternaria a partir de el resto de las variables
                  data=      dtrain,  #los datos donde voy a entrenar
+                 parms=list(
+                   loss=matrix(c(0,1,39,0), byrow = TRUE, nrow = 2)),
                  xval=      0,
                  cp=       -1,   #esto significa no limitar la complejidad de los splits
-                 minsplit=  200,     #minima cantidad de registros para que se haga el split
-                 minbucket= 45,     #tamaño minimo de una hoja
+                 minsplit=  1498,     #minima cantidad de registros para que se haga el split
+                 minbucket= 521,     #tamaño minimo de una hoja
                  maxdepth=  5 )    #profundidad maxima del arbol
 
 
@@ -41,10 +58,12 @@ prediccion  <- predict( object= modelo,
 #cada columna es el vector de probabilidades 
 
 #agrego a dapply una columna nueva que es la probabilidad de BAJA+2
-dapply[ , prob_baja2 := prediccion[, "BAJA+2"] ]
+dapply[ , prob_baja2 := prediccion[, "evento"] ]
 
 #solo le envio estimulo a los registros con probabilidad de BAJA+2 mayor  a  1/40
 dapply[ , Predicted := as.numeric( prob_baja2 > 1/40 ) ]
+
+dapply[Predicted == 1]
 
 #genero el archivo para Kaggle
 #primero creo la carpeta donde va el experimento
@@ -52,8 +71,8 @@ dir.create( "./exp/" )
 dir.create( "./exp/KA2001" )
 
 fwrite( dapply[ , list(numero_de_cliente, Predicted) ], #solo los campos para Kaggle
-        file= "./exp/KA2001/K101_hiperparametros_bayesian_opt.csv",
+        file= "./exp/KA2001/K101_hp_bo_binaria_gc_1.csv",
         sep=  "," )
 
-#score kaggle: 19632.93159
+#score kaggle: 19172.94100
 

@@ -80,8 +80,8 @@ obj_fun <- makeSingleObjectiveFunction(
   minimize = FALSE,
   fn = obj_fun_md_ms_mb,
   par.set = makeParamSet(
-    makeIntegerParam("maxdepth",  lower = 4L, upper = 20L),
-    makeIntegerParam("minsplit",  lower = 1L, upper = 1000L),
+    makeIntegerParam("maxdepth",  lower = 3L, upper = 20L),
+    makeIntegerParam("minsplit",  lower = 1L, upper = 5000L),
     makeNumericParam("minbucket", lower = 0L, upper = 1L) 
   ),
   noisy = TRUE,
@@ -105,8 +105,6 @@ surr_km <- makeLearner("regr.km", predict.type = "se", covtype = "matern3_2")
 run_md_ms_mb <- mbo(obj_fun, learner = surr_km, control = ctrl, )
 print(run_md_ms_mb)
 
-#mejores hiperparámetros
-#maxdepth: 19
-#minsplit: 846
-#minbucket: 0.76 -> 643
-#ganancia: 18682667
+#Recommended parameters:
+  #maxdepth=5; minsplit=322; minbucket=0.493 (158)
+  #Objective: y = 19176000.000

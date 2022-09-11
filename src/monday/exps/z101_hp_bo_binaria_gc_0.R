@@ -19,12 +19,14 @@ dtrain  <- dataset[ foto_mes==202101 ]  #defino donde voy a entrenar
 dapply  <- dataset[ foto_mes==202103 ]  #defino donde voy a aplicar el modelo
 
 #genero el modelo,  aqui se construye el arbol
+#hiperparámetros obtenidos con optimización bayeasiana para target binario, en google cloud
+#siguiendo z301
 modelo  <- rpart(formula=   "clase_ternaria ~ .",  #quiero predecir clase_ternaria a partir de el resto de las variables
                  data=      dtrain,  #los datos donde voy a entrenar
                  xval=      0,
                  cp=       -1,   #esto significa no limitar la complejidad de los splits
-                 minsplit=  200,     #minima cantidad de registros para que se haga el split
-                 minbucket= 45,     #tamaño minimo de una hoja
+                 minsplit=  322,     #minima cantidad de registros para que se haga el split
+                 minbucket= 158,     #tamaño minimo de una hoja
                  maxdepth=  5 )    #profundidad maxima del arbol
 
 
@@ -52,8 +54,7 @@ dir.create( "./exp/" )
 dir.create( "./exp/KA2001" )
 
 fwrite( dapply[ , list(numero_de_cliente, Predicted) ], #solo los campos para Kaggle
-        file= "./exp/KA2001/K101_hiperparametros_bayesian_opt.csv",
+        file= "./exp/KA2001/K101_hp_bo_binaria_gc_0.csv",
         sep=  "," )
 
-#score kaggle: 19632.93159
-
+#score kaggle: 20852.90663
