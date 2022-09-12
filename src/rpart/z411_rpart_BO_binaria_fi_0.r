@@ -24,6 +24,7 @@ require("parallel")
 #paquetes necesarios para la Bayesian Optimization
 require("DiceKriging")
 require("mlrMBO")
+require("dplyr")
 
 #aqui deben ir SUS semillas, se usan para  1-Repeated  (5-Fold Cross Validation)
 ksemilla_azar  <- c(309367)
@@ -95,8 +96,8 @@ ArbolSimple  <- function( fold_test, data, param )
                   "mactivos_margen",
                   "mcaja_ahorro",
                   "mcuenta_corriente")
-  campos <- paste(vars_ntile, collapse = " - ")
-  formula <- paste0( "clase_binaria ~ .  -Visa_mpagado -mcomisiones_mantenimiento -clase_ternaria", campos )
+  campos <- paste(vars_ntile, collapse = " -")
+  formula <- paste0( "clase_binaria ~ .  -Visa_mpagado -mcomisiones_mantenimiento -clase_ternaria ", campos )
   
   #genero el modelo
   modelo  <- rpart(formula,
@@ -257,9 +258,9 @@ if( !file.exists( archivo_BO ) ) {
 } else  run  <- mboContinue( archivo_BO )   #retomo en caso que ya exista
 
 #mejores hiper parámetros obtenidos en google cloud
-#cp: -0.962955870679731
-#minsplit: 1037.42474916993
-#minbucket: 38.9831670377345
-#maxdepth: 20
+#cp: -0.259670209787146
+#minsplit: 1707.98733056925
+#minbucket: 739.142658406359
+#maxdepth: 10
 #xvalfolds: 5
 #ganancia: 21773333.3333333

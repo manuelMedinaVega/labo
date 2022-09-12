@@ -26,7 +26,7 @@ require("DiceKriging")
 require("mlrMBO")
 
 #aqui deben ir SUS semillas, se usan para  1-Repeated  (5-Fold Cross Validation)
-ksemilla_azar  <- c(102191)
+ksemilla_azar  <- c(309367)
 
 
 #Defino la  Optimizacion Bayesiana

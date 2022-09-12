@@ -22,6 +22,16 @@ dataset  <- fread("./datasets/competencia1_2022.csv" )
 dataset[ foto_mes==202101, 
          clase_binaria :=  ifelse( clase_ternaria=="CONTINUA", "NO", "SI" ) ]
 
+vars_ntile <- c("ctrx_quarter",
+                "mprestamos_personales",
+                "mcuentas_saldo",
+                "mactivos_margen",
+                "mcaja_ahorro",
+                "mcuenta_corriente")
+prefix <- "r_"
+for (var in vars_ntile) {
+  dataset[, (paste(prefix, var, sep = "")) := ntile(get(var), 10)]
+}
 
 dtrain  <- dataset[ foto_mes==202101 ]  #defino donde voy a entrenar
 dapply  <- dataset[ foto_mes==202103 ]  #defino donde voy a aplicar el modelo
@@ -31,13 +41,16 @@ dapply  <- dataset[ foto_mes==202103 ]  #defino donde voy a aplicar el modelo
 # obviamente rpart no puede ve  clase_ternaria para predecir  clase_binaria
 #  #no utilizo Visa_mpagado ni  mcomisiones_mantenimiento por drifting
 
-modelo  <- rpart(formula=   "clase_binaria ~ . -clase_ternaria",
+campos <- paste(vars_ntile, collapse = " -")
+formula <- paste0( "clase_binaria ~ . -Visa_mpagado -mcomisiones_mantenimiento -clase_ternaria ", campos )
+
+modelo  <- rpart(formula=   formula,
                  data=      dtrain,  #los datos donde voy a entrenar
                  xval=         0,
-                 cp=          -0.962955870679731,#  -0.89
-                 minsplit=  1037.42474916993,   # 621
-                 minbucket=  38.9831670377345,   # 309
-                 maxdepth=     20 )  #  12
+                 cp=          -0.259670209787146,#  -0.89
+                 minsplit=  1707.98733056925,   # 621
+                 minbucket=  739.142658406359,   # 309
+                 maxdepth=     10 )  #  12
 
 #----------------------------------------------------------------------------
 # habilitar esta seccion si el Fiscal General  Alejandro Bolaños  lo autoriza
@@ -101,15 +114,6 @@ for( corte  in  c( 7500, 8000, 8500, 9000, 9500, 10000, 10500, 11000 ) )
 }
 
 #ganancias kaggle
-#KA4120_005_7500: 20659.57725
-#KA4120_005_8000: 20412.91563
-#KA4120_005_8500: 20732.90908
-#KA4120_005_9000: 21126.23437
-#KA4120_005_9500: 21619.55761
-#KA4120_005_10000: 21226.23232
-#KA4120_005_10500: 20406.24910
-#KA4120_005_11000: 20506.24705
-
 #con corrección de data drifting
 #KA4120_005_7500: 20659.57725
 #KA4120_005_8000: 20412.91563
