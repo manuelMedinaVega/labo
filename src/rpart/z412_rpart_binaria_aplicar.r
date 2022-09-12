@@ -1,6 +1,10 @@
 #Aplicacion de los mejores hiperparametros encontrados en una bayesiana
 #Utilizando clase_binaria =  [  SI = { "BAJA+1", "BAJA+2"} ,  NO="CONTINUA ]
 
+#limpio la memoria
+rm( list=ls() )  #remove all objects
+gc()             #garbage collection
+
 #cargo las librerias que necesito
 require("data.table")
 require("rpart")
@@ -8,7 +12,7 @@ require("rpart.plot")
 
 
 #Aqui se debe poner la carpeta de la materia de SU computadora local
-setwd("D:\\gdrive\\UBA2022\\")  #Establezco el Working Directory
+setwd(gsub(" ", "", paste(gsub('/', '\\\\', gsub("/m_d_m/dmef", "", getwd())), "\\m_d_m\\dmef")))
 
 #cargo el dataset
 dataset  <- fread("./datasets/competencia1_2022.csv" )
@@ -30,10 +34,10 @@ dapply  <- dataset[ foto_mes==202103 ]  #defino donde voy a aplicar el modelo
 modelo  <- rpart(formula=   "clase_binaria ~ . -clase_ternaria",
                  data=      dtrain,  #los datos donde voy a entrenar
                  xval=         0,
-                 cp=          -0.54,#  -0.89
-                 minsplit=  1073,   # 621
-                 minbucket=  278,   # 309
-                 maxdepth=     9 )  #  12
+                 cp=          -0.962955870679731,#  -0.89
+                 minsplit=  1037.42474916993,   # 621
+                 minbucket=  38.9831670377345,   # 309
+                 maxdepth=     20 )  #  12
 
 
 #----------------------------------------------------------------------------
@@ -41,22 +45,22 @@ modelo  <- rpart(formula=   "clase_binaria ~ . -clase_ternaria",
 #----------------------------------------------------------------------------
 
 # corrijo manualmente el drifting de  Visa_fultimo_cierre
-# dapply[ Visa_fultimo_cierre== 1, Visa_fultimo_cierre :=  4 ]
-# dapply[ Visa_fultimo_cierre== 7, Visa_fultimo_cierre := 11 ]
-# dapply[ Visa_fultimo_cierre==21, Visa_fultimo_cierre := 25 ]
-# dapply[ Visa_fultimo_cierre==14, Visa_fultimo_cierre := 18 ]
-# dapply[ Visa_fultimo_cierre==28, Visa_fultimo_cierre := 32 ]
-# dapply[ Visa_fultimo_cierre==35, Visa_fultimo_cierre := 39 ]
-# dapply[ Visa_fultimo_cierre> 39, Visa_fultimo_cierre := Visa_fultimo_cierre + 4 ]
+dapply[ Visa_fultimo_cierre== 1, Visa_fultimo_cierre :=  4 ]
+dapply[ Visa_fultimo_cierre== 7, Visa_fultimo_cierre := 11 ]
+dapply[ Visa_fultimo_cierre==21, Visa_fultimo_cierre := 25 ]
+dapply[ Visa_fultimo_cierre==14, Visa_fultimo_cierre := 18 ]
+dapply[ Visa_fultimo_cierre==28, Visa_fultimo_cierre := 32 ]
+dapply[ Visa_fultimo_cierre==35, Visa_fultimo_cierre := 39 ]
+dapply[ Visa_fultimo_cierre> 39, Visa_fultimo_cierre := Visa_fultimo_cierre + 4 ]
 
 # corrijo manualmente el drifting de  Visa_fultimo_cierre
-# dapply[ Master_fultimo_cierre== 1, Master_fultimo_cierre :=  4 ]
-# dapply[ Master_fultimo_cierre== 7, Master_fultimo_cierre := 11 ]
-# dapply[ Master_fultimo_cierre==21, Master_fultimo_cierre := 25 ]
-# dapply[ Master_fultimo_cierre==14, Master_fultimo_cierre := 18 ]
-# dapply[ Master_fultimo_cierre==28, Master_fultimo_cierre := 32 ]
-# dapply[ Master_fultimo_cierre==35, Master_fultimo_cierre := 39 ]
-# dapply[ Master_fultimo_cierre> 39, Master_fultimo_cierre := Master_fultimo_cierre + 4 ]
+dapply[ Master_fultimo_cierre== 1, Master_fultimo_cierre :=  4 ]
+dapply[ Master_fultimo_cierre== 7, Master_fultimo_cierre := 11 ]
+dapply[ Master_fultimo_cierre==21, Master_fultimo_cierre := 25 ]
+dapply[ Master_fultimo_cierre==14, Master_fultimo_cierre := 18 ]
+dapply[ Master_fultimo_cierre==28, Master_fultimo_cierre := 32 ]
+dapply[ Master_fultimo_cierre==35, Master_fultimo_cierre := 39 ]
+dapply[ Master_fultimo_cierre> 39, Master_fultimo_cierre := Master_fultimo_cierre + 4 ]
 
 
 #aplico el modelo a los datos nuevos
@@ -74,7 +78,7 @@ dfinal[ , prob_SI := prediccion[ , "SI"] ]
 
 # por favor cambiar por una semilla propia
 # que sino el Fiscal General va a impugnar la prediccion
-set.seed(102191)  
+set.seed(309367)  
 dfinal[ , azar := runif( nrow(dapply) ) ]
 
 # ordeno en forma descentente, y cuando coincide la probabilidad, al azar
@@ -96,3 +100,23 @@ for( corte  in  c( 7500, 8000, 8500, 9000, 9500, 10000, 10500, 11000 ) )
            file= paste0( "./exp/KA4120/KA4120_005_",  corte, ".csv"),
            sep=  "," )
 }
+
+#ganancias kaggle
+#KA4120_005_7500: 20659.57725
+#KA4120_005_8000: 20412.91563
+#KA4120_005_8500: 20732.90908
+#KA4120_005_9000: 21126.23437
+#KA4120_005_9500: 21619.55761
+#KA4120_005_10000: 21226.23232
+#KA4120_005_10500: 20406.24910
+#KA4120_005_11000: 20506.24705
+
+#con corrección de data drifting
+#KA4120_005_7500: 20659.57725
+#KA4120_005_8000: 20412.91563
+#KA4120_005_8500: 20732.90908
+#KA4120_005_9000: 21126.23437
+#KA4120_005_9500: 21619.55761
+#KA4120_005_10000: 21226.23232
+#KA4120_005_10500: 20406.24910
+#KA4120_005_11000: 20506.24705

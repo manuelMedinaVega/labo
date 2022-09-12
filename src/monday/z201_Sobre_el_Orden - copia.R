@@ -10,7 +10,7 @@
 ##
 
 rm( list=ls() )  #remove all objects
-gc()             #garbage collection
+gc()    
 
 # Librerías necesarias
 require("data.table")
@@ -155,9 +155,9 @@ print(hojas[ganancia > 0, .(
 
 # Creamos un nuevo target binario
 dtrain[, clase_binaria := ifelse(
-                            clase_ternaria == "BAJA+2",
-                                "evento",
-                                "noevento"
+                            clase_ternaria == "CONTINUA",
+                                "NO",
+                                "SI"
                             )]
 # Borramos el target viejo
 dtrain[, clase_ternaria := NULL]
@@ -173,11 +173,11 @@ arbolbinario <- rpart("clase_binaria ~ .",
 hojasbinario <- tablahojas(arbolbinario, dtrain, "clase_binaria")
 
 # Y agregamos la ganancia de cada hoja
-hojasbinario[, ganancia := evento * 78000 - 2000 * noevento]
+hojasbinario[, ganancia := SI * 78000 - 2000 * NO]
 print(hojasbinario)
 # Por último sumarizamos
 print(hojasbinario[ganancia > 0,
- .(ganancia = sum(ganancia), enviados = sum(TOTAL), sevan = sum(evento))])
+ .(ganancia = sum(ganancia), enviados = sum(TOTAL), sevan = sum(SI))])
 
 ## Pregunta
 ## - ¿Considera que la agrupación de clases fue positiva para la  ganancia? sí, aumentó
@@ -187,7 +187,7 @@ print(hojasbinario[ganancia > 0,
 ## ---------------------------
 
 # Calculamos la probabilidad de evento en cada hoja
-hojasbinario[, p_evento := evento / (evento + noevento)]
+hojasbinario[, p_evento := SI / (SI + NO)]
 
 # Ordenamos de forma descendiente las probabilidades, ya que nos interesan
 # ante todo las probabilidades más altas

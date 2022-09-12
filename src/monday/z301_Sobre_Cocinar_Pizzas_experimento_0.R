@@ -36,11 +36,6 @@ ganancia <- function(probabilidades, clase) {
   )
 }
 
-#predicted
-#actual     noevento  evento
-#noevento   0         1
-#evento     39         0
-
 modelo_rpart <- function(train, test, cp =  0, ms = 20, mb = 1, md = 10) {
   modelo <- rpart(clase_binaria ~ ., data = train,
                   xval = 0,

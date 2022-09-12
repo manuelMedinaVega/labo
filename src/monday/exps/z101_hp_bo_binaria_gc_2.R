@@ -1,6 +1,10 @@
 #Arbol elemental con libreria  rpart
 #Debe tener instaladas las librerias  data.table  ,  rpart  y  rpart.plot
 
+#limpio la memoria
+rm( list=ls() )  #remove all objects
+gc()             #garbage collection
+
 #cargo las librerias que necesito
 require("data.table")
 require("rpart")
@@ -15,27 +19,21 @@ semillas <- c(309367, 149521, 690467, 699191, 795931)
 #cargo el dataset
 dataset  <- fread("./datasets/competencia1_2022.csv")
 
-dataset[, clase_binaria := ifelse(
-  clase_ternaria == "BAJA+2",
-  "evento",
-  "noevento"
-)]
-
-dataset[, clase_ternaria := NULL]
+dataset[ foto_mes==202101, clase_binaria :=  ifelse( clase_ternaria=="CONTINUA", "NO", "SI" ) ]
 
 dtrain  <- dataset[ foto_mes==202101 ]  #defino donde voy a entrenar
 dapply  <- dataset[ foto_mes==202103 ]  #defino donde voy a aplicar el modelo
 
 #genero el modelo,  aqui se construye el arbol
 #hiperparámetros obtenidos con optimización bayeasiana para target binario, en google cloud
-#siguiendo z301
-modelo  <- rpart(formula=   "clase_ternaria ~ . -clase_ternaria",  #quiero predecir clase_ternaria a partir de el resto de las variables
+#siguiendo z411
+modelo  <- rpart(formula=   "clase_binaria ~ .  -Visa_mpagado -mcomisiones_mantenimiento -clase_ternaria",  #quiero predecir clase_ternaria a partir de el resto de las variables
                  data=      dtrain,  #los datos donde voy a entrenar
                  xval=      0,
-                 cp=       -1,   #esto significa no limitar la complejidad de los splits
-                 minsplit=  322,     #minima cantidad de registros para que se haga el split
-                 minbucket= 158,     #tamaño minimo de una hoja
-                 maxdepth=  5 )    #profundidad maxima del arbol
+                 cp=       -0.962955870679731,   #esto significa no limitar la complejidad de los splits
+                 minsplit=  1037.42474916993,     #minima cantidad de registros para que se haga el split
+                 minbucket= 38.9831670377345,     #tamaño minimo de una hoja
+                 maxdepth=  20 )    #profundidad maxima del arbol
 
 
 #grafico el arbol
@@ -51,7 +49,7 @@ prediccion  <- predict( object= modelo,
 #cada columna es el vector de probabilidades 
 
 #agrego a dapply una columna nueva que es la probabilidad de BAJA+2
-dapply[ , prob_baja2 := prediccion[, "BAJA+2"] ]
+dapply[ , prob_baja2 := prediccion[, "SI"] ]
 
 #solo le envio estimulo a los registros con probabilidad de BAJA+2 mayor  a  1/40
 dapply[ , Predicted := as.numeric( prob_baja2 > 1/40 ) ]
@@ -62,7 +60,6 @@ dir.create( "./exp/" )
 dir.create( "./exp/KA2001" )
 
 fwrite( dapply[ , list(numero_de_cliente, Predicted) ], #solo los campos para Kaggle
-        file= "./exp/KA2001/K101_hp_bo_binaria_gc_0.csv",
+        file= "./exp/KA2001/K101_hp_bo_binaria_gc_2.csv",
         sep=  "," )
 
-#score kaggle: 20852.90663

@@ -26,7 +26,7 @@ require("DiceKriging")
 require("mlrMBO")
 
 #aqui deben ir SUS semillas, se usan para  1-Repeated  (5-Fold Cross Validation)
-ksemilla_azar  <- c(102191)
+ksemilla_azar  <- c(309367)
 
 
 #Defino la  Optimizacion Bayesiana
@@ -89,8 +89,17 @@ ArbolSimple  <- function( fold_test, data, param )
   #param2$minsplit   <- as.integer( round( 2^param$minsplit ) )
   #param2$minbucket  <- as.integer( round( 2^param$minbucket ) )
   
+  vars_ntile <- c("ctrx_quarter",
+                  "mprestamos_personales",
+                  "mcuentas_saldo",
+                  "mactivos_margen",
+                  "mcaja_ahorro",
+                  "mcuenta_corriente")
+  campos <- paste(vars_ntile, collapse = " - ")
+  formula <- paste0( "clase_binaria ~ .  -Visa_mpagado -mcomisiones_mantenimiento -clase_ternaria", campos )
+  
   #genero el modelo
-  modelo  <- rpart("clase_binaria ~ .  -Visa_mpagado -mcomisiones_mantenimiento -clase_ternaria",
+  modelo  <- rpart(formula,
                    data= data[ fold != fold_test, ],  #entreno en todo MENOS el fold_test que uso para testing
                    xval= 0,
                    control= param2 )
@@ -184,16 +193,26 @@ dataset[ foto_mes==202101, clase_binaria :=  ifelse( clase_ternaria=="CONTINUA",
 #defino los datos donde entreno
 dtrain  <- dataset[ foto_mes==202101, ]
 
+vars_ntile <- c("ctrx_quarter",
+                "mprestamos_personales",
+                "mcuentas_saldo",
+                "mactivos_margen",
+                "mcaja_ahorro",
+                "mcuenta_corriente")
+prefix <- "r_"
+for (var in vars_ntile) {
+  dtrain[, (paste(prefix, var, sep = "")) := ntile(get(var), 10)]
+}
 
 #creo la carpeta donde va el experimento
 # HT  representa  Hiperparameter Tuning
 dir.create( "./exp/",  showWarnings = FALSE ) 
-dir.create( "./exp/HT4110/", showWarnings = FALSE )
-setwd("./exp/HT4110/")   #Establezco el Working Directory DEL EXPERIMENTO
+dir.create( "./exp/HT4110_fi_0/", showWarnings = FALSE )
+setwd("./exp/HT4110_fi_0/")   #Establezco el Working Directory DEL EXPERIMENTO
 
 #defino los archivos donde guardo los resultados de la Bayesian Optimization
-archivo_log  <- "HT4110.txt"
-archivo_BO   <- "HT4110.RDATA"
+archivo_log  <- "HT4110_fi_0.txt"
+archivo_BO   <- "HT4110_fi_0.RDATA"
 
 #leo si ya existe el log, para retomar en caso que se se corte el programa
 GLOBAL_iteracion  <- 0
