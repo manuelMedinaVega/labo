@@ -18,9 +18,10 @@ require("rpart")
 require("ggplot2")
 
 # Poner la carpeta de la materia de SU computadora local
-setwd("/home/aleb/dmeyf2022")
+setwd(gsub(" ", "", paste(gsub('/', '\\\\', gsub("/m_d_m/dmef", "", getwd())), "\\m_d_m\\dmef")))
+
 # Poner sus semillas
-semillas <- c(17, 19, 23, 29, 31)
+semillas <- c(309367, 149521, 690467, 699191, 795931)
 
 # Cargamos los datasets y nos quedamos solo con 202101 y 202103
 dataset <- fread("./datasets/competencia2_2022.csv.gz")
@@ -81,6 +82,8 @@ leaderboad
 
 # Guardar la salida para comparar más adelante
 summary(leaderboad)
+
+#esto ocurre porque a veces una particion puede quedar con valores más fáciles de predecir
 
 ## Preguntas
 ## ¿Qué conclusiones saca al ver los valores?
@@ -163,3 +166,13 @@ df3 <- melt(leaderboad2, measure.vars =  c("privado", "privado2"))
 ggplot(df3, aes(x = value, color = variable)) + geom_density()
 
 ## Active learning ... entender que pasa.
+
+#los meses están correlacionados, el mes 2 tiene datos de 3
+#parámetros | test | apply
+#01 mcv | 03 test | 01/02/03 -> 05
+#01/02 mcv | ...
+# walk forward validation, entreno con 01, valido con 03
+  #entrenos con todo enero, valido con marzo
+  #01->03 | 
+  #busqueda de hp con 01, validamos los hp con 03
+#

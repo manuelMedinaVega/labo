@@ -47,9 +47,10 @@ require("randomForest")
 require("lightgbm")
 
 # Poner la carpeta de la materia de SU computadora local
-setwd("/home/aleb/dmeyf2022")
+setwd(gsub(" ", "", paste(gsub('/', '\\\\', gsub("/m_d_m/dmef", "", getwd())), "\\m_d_m\\dmef")))
+
 # Poner sus semillas
-semillas <- c(17, 19, 23, 29, 31)
+semillas <- c(309367, 149521, 690467, 699191, 795931)
 
 # Cargamos los datasets y nos quedamos solo con 202101 y 202103
 dataset <- fread("./datasets/competencia2_2022.csv.gz")
@@ -70,7 +71,7 @@ dtrain  <-  enero[in_training, ]
 dtest   <-  enero[-in_training, ]
 
 # ranger no soporta, como lo hacen otras librerías, los missing values
-dtrain <-  na.roughfix(dtrain)
+dtrain <-  na.roughfix(dtrain) #imputa con mediana
 dtest <-  na.roughfix(dtest)
 
 # Cantidad de variables que abren por cada hoja
@@ -82,7 +83,7 @@ modelo_rf_1 <- ranger(clase_binaria1 ~ ., data = dtrain,
                   num.trees = 100,
                   min.node.size=10,
                   mtry = n_variables,
-                  splitrule = "gini",
+                  splitrule = "gini",#como se decide cortar
                   sample.fraction = 0.66,
                   importance = "impurity",
                   verbose = TRUE)
@@ -92,6 +93,9 @@ as.numeric(t1 - t0, units = "secs")
 ## ---------------------------
 ## Step 3: Midiendo el primero RF
 ## ---------------------------
+#los parámetros más importantes para random forest, son las variables que les metes y 
+#la cantidad de árboles que vas a armar
+#mayor cantidad de árboles se compensa con la cantidad de variables que tiene el arbol
 
 pred_train <- predict(modelo_rf_1, dtrain)
 pred_test <- predict(modelo_rf_1, dtest)
@@ -106,7 +110,7 @@ print(sum((pred_test$predictions[, "evento"] >= 0.025) * ifelse(
                     78000, -2000) / 0.3))
 
 ## Preguntas
-## - ¿Qué paso en `train`?
+## - ¿Qué paso en `train`? overfitea
 ## - ¿Se veía esa diferencia en los árboles?
 
 ## ---------------------------
@@ -121,7 +125,7 @@ importancia
 
 ## Preguntas
 ## - ¿Qué significa que una variable sea más importante que otra?
-## - ¿Qué significa que una variable tenga 0 importancia?
+## - ¿Qué significa que una variable tenga 0 importancia? no suma valor, pero al agregar más arboles puede tener importancia
 ## - ¿Con el **RF** es suficiente como para descartarlas?
 ## - ¿Qué una variable tenga algo de importancia es suficiente como para
 ## - entender que da valor?
@@ -148,6 +152,8 @@ setorder(importancia2, -importancia)
 importancia2
 which(importancia2$variable == "pollito")
 
+#porque aparece tercero pollito? 
+
 ## Active learning o a llorar a la iglesia.
 
 ## ---------------------------
@@ -170,6 +176,8 @@ colnames(importancia3) <- c("variable", "importancia")
 setorder(importancia3, -importancia)
 importancia3
 which(importancia3$variable == "pollito")
+#ayuda que el tamaño del nodo sea 1000
+#ayuda a que el punto de corte sea aleatorio, para no considerar al pollito
 
 ## ---------------------------
 ## Step 6: Boosting, la navaja suiza de los modelos - Conceptos
