@@ -57,6 +57,7 @@ marzo$pred <- predict(modelo, marzo, type = "prob")[, "evento"]
 marzo[, sum(ifelse(pred > 0.025,
                 ifelse(clase_ternaria == "BAJA+2", 78000, -2000)
             , 0))]
+#Ganancia: 18510000
 
 ## ---------------------------
 ## Step 3: Creando 100 leaderboards
@@ -117,6 +118,7 @@ marzo$pred2 <- predict(modelo2, marzo, type = "prob")[, "evento"]
 marzo[, sum(ifelse(pred2 >= 0.025,
                 ifelse(clase_ternaria == "BAJA+2", 78000, -2000)
             , 0))]
+#ganancia: 19232000
 
 ## Preguntas
 ## Abriendo la caja de pandora, ¿Cúal de los dos modelos era mejor?
