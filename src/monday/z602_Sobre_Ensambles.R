@@ -216,9 +216,9 @@ dtrain  <- lgb.Dataset(data = data.matrix(enero), label = clase_binaria)
 
 ganancia_lgb <- function(probs, datos) {
   return(list("name" = "ganancia",
-                "value" =  sum( (probs > 0.025) *
-                    ifelse(getinfo(datos, "label") == 1, 78000, -2000)) / 0.2,
-                "higher_better" = TRUE))
+              "value" =  sum( (probs > 0.025) *
+                  ifelse(getinfo(datos, "label") == 1, 78000, -2000)) / 0.2,
+              "higher_better" = TRUE))
 }
 
 set.seed(semillas[1])

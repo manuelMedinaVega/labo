@@ -20,9 +20,10 @@ require("ggplot2")
 require("lightgbm")
 
 # Poner la carpeta de la materia de SU computadora local
-setwd("/home/aleb/dmeyf2022")
+setwd(gsub(" ", "", paste(gsub('/', '\\\\', gsub("/m_d_m/dmef", "", getwd())), "\\m_d_m\\dmef")))
+
 # Poner sus semillas
-semillas <- c(17, 19, 23, 29, 31)
+semillas <- c(309367, 149521, 690467, 699191, 795931)
 
 # Cargamos los datasets y nos quedamos solo con 202101 y 202103
 dataset <- fread("./datasets/competencia2_2022.csv.gz")
@@ -101,8 +102,8 @@ model_lgbm_cv <- lgb.cv(
         use_missing = TRUE,
 
         # Variables de crecimiento del árbol.
-        max_depth = 12, # -1 = No limitar
-        min_data_in_leaf = 4000,
+        max_depth = 12, # -1 = No limitar - No parametrizar max_depth
+        min_data_in_leaf = 4000, #similar a min_bucket
         feature_pre_filter = FALSE, #feature_pre_filter: Evita que LightGBM deje de lado variables que considera malas.
         num_leaves = 100,
 

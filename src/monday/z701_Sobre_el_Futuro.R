@@ -23,9 +23,10 @@ require("ggplot2")
 require("lightgbm")
 
 # Poner la carpeta de la materia de SU computadora local
-setwd("/home/aleb/dmeyf2022")
+setwd(gsub(" ", "", paste(gsub('/', '\\\\', gsub("/m_d_m/dmef", "", getwd())), "\\m_d_m\\dmef")))
+
 # Poner sus semillas
-semillas <- c(17, 19, 23, 29, 31)
+semillas <- c(309367, 149521, 690467, 699191, 795931)
 
 # Cargamos los datasets y nos quedamos solo con 202101 y 202103
 dataset <- fread("./datasets/competencia2_2022.csv.gz")
@@ -66,6 +67,9 @@ sum((marzo$pred > 0.025) * ifelse(marzo$clase_ternaria == "BAJA+2", 78000, -2000
 length(marzo$pred)
 length(unique(marzo$pred))
 
+#lgbm asigna una probabilidad personalizada para cada nodo, a diferencia de los árboles
+#que puede asignar la misma probabilidad a registros que han quedado en la misma hoja
+
 ## Preguntas
 ## - ¿Qué diferencia observa con respecto a ?
 
@@ -83,12 +87,14 @@ sum(marzo$pred > 0.025) # En mi caso dice que estaría mandando 7744
 # Y obtendríamos una ganancia de
 # Privado
 sum((marzo$pred[split] > 0.025) * ifelse(marzo$clase_ternaria[split] == "BAJA+2", 78000, -2000)) / 0.5
-
+#24832000
 # Público
 sum((marzo$pred[-split] > 0.025) * ifelse(marzo$clase_ternaria[-split] == "BAJA+2", 78000, -2000)) / 0.5
+#23272000
 
 # Pero... que pasa si mandamos otra cantidad de casos?
 # Vamos a mandar los N mejores casos, de a separaciones de M
+# ya no ver el punto de corte, sino mandar en lotes, por ejemplo quiero estimular a 1000, luego 1500, ...
 
 ## ---------------------------
 ## Step 4: Buscando el mejor punto de corte en el leaderboard público.
@@ -98,10 +104,10 @@ sum((marzo$pred[-split] > 0.025) * ifelse(marzo$clase_ternaria[-split] == "BAJA+
 setorder(marzo, cols = -pred)
 
 # PROBAR MULTIPLES VALORES
-set.seed(semillas[3])
-m <- 500
-f <- 2000
-t <- 12000
+#set.seed(semillas[3])
+m <- 500 #saltos de los lotes
+f <- 2000 #desde 2000
+t <- 12000 #hasta 12000
 
 leaderboad <- data.table()
 split <- caret::createDataPartition(marzo$clase_ternaria, p = 0.50, list = FALSE)
@@ -123,4 +129,11 @@ ggplot(leaderboad, aes(x = envio, y = valor, color = board)) + geom_line()
 ## ACTIVE LEARNING: Juegue con los parámetros y busque si hay alguna información
 ## en el leaderboard público que le de una estrategia para elegir la cantidad
 ## adecuada para ganar maximizar la ganancia del privado.
+
+#como elegir el punto adecuado
+#la curva debería ser suave, pero la perturbación en los bajas hace que cambie, 
+#a veces quedan buenos bajas en un lado y no en el otro
+#delimitarlo de 10 y hacer un análisis profundo de el mejor punto
+
+
 
