@@ -102,18 +102,23 @@ model_lgbm_cv <- lgb.cv(
         use_missing = TRUE,
 
         # Variables de crecimiento del árbol.
-        max_depth = 12, # -1 = No limitar - No parametrizar max_depth
-        min_data_in_leaf = 4000, #similar a min_bucket
+        max_depth = 12, # -1 = No limitar - No parametrizar max_depth. It gives the depth of the tree and also controls 
+        #the overfitting of the model
+        min_data_in_leaf = 4000, #similar a min_bucket. Leaf minimum number of records also used for controlling 
+        #overfitting of the model
         feature_pre_filter = FALSE, #feature_pre_filter: Evita que LightGBM deje de lado variables que considera malas.
         num_leaves = 100,
 
         # Parámetros que fueron sacados de los rf porque lo que anda se mete:
-        feature_fraction = 0.50, # Porcentaje de columnas que van a usarse en un árbol
+        feature_fraction = 0.50, # Porcentaje de columnas que van a usarse en un árbol. It decides the randomly chosen 
+        #features in every iteration for building trees. If it is 0.7 then it means 70% of the features would be used
         # feature_fraction_bynode si queremos que sea por nodo
-        bagging_fraction = 1.0, # % de registros a considerar en cada árbol
+        bagging_fraction = 1.0, # % de registros a considerar en cada árbol. It checks for the data fraction that will 
+        #be used in every iteration. Often, used to increase the training speed and avoid overfitting
         extra_tree = FALSE, # Los puntos de corte los elige al azar.
 
         # Parámetros de las famosas regularizaciones!!
+        #Lambda: It states regularization. Its values range from 0 to 1.
         lambda_l1 = 0.0,
         lambda_l2 = 0.0,
         min_gain_to_split = 0.0,
@@ -124,6 +129,8 @@ model_lgbm_cv <- lgb.cv(
         # Cuántos árboles vamos a generar
         num_iterations = 100, # Debe ser un número muy grande, recordar el double descent!!!.
         early_stopping_rounds = 100 # Corta cuando después de tantos árboles no vio una ganancia mejor a la máxima.
+        #If the metric of the validation data does show any improvement in last early_stopping_round rounds. It 
+        #will lower the imprudent iterations.
     ),
     verbose = -1
 )
