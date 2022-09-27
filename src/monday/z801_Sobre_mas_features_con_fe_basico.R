@@ -133,6 +133,72 @@ lgb.importance(mlgb2)$Feature
 ## Step 7: Sumando canaritos
 ## ---------------------------
 
+marzo[  , ctrx_quarter_normalizado := ctrx_quarter ]
+marzo[ cliente_antiguedad==1 , ctrx_quarter_normalizado := ctrx_quarter * 5 ]
+marzo[ cliente_antiguedad==2 , ctrx_quarter_normalizado := ctrx_quarter * 2 ]
+marzo[ cliente_antiguedad==3 , ctrx_quarter_normalizado := ctrx_quarter * 1.2 ]
+
+#variable extraida de una tesis de maestria de Irlanda
+marzo[  , mpayroll_sobre_edad  := mpayroll / cliente_edad ]
+
+#se crean los nuevos campos para MasterCard  y Visa, teniendo en cuenta los NA's
+#varias formas de combinar Visa_status y Master_status
+marzo[ , mv_status01       := pmax( Master_status,  Visa_status, na.rm = TRUE) ]
+marzo[ , mv_status02       := Master_status +  Visa_status ]
+marzo[ , mv_status03       := pmax( ifelse( is.na(Master_status), 10, Master_status) , ifelse( is.na(Visa_status), 10, Visa_status) ) ]
+marzo[ , mv_status04       := ifelse( is.na(Master_status), 10, Master_status)  +  ifelse( is.na(Visa_status), 10, Visa_status)  ]
+marzo[ , mv_status05       := ifelse( is.na(Master_status), 10, Master_status)  +  100*ifelse( is.na(Visa_status), 10, Visa_status)  ]
+
+marzo[ , mv_status06       := ifelse( is.na(Visa_status), 
+                                        ifelse( is.na(Master_status), 10, Master_status), 
+                                        Visa_status)  ]
+
+marzo[ , mv_status07       := ifelse( is.na(Master_status), 
+                                        ifelse( is.na(Visa_status), 10, Visa_status), 
+                                        Master_status)  ]
+
+
+#combino MasterCard y Visa
+marzo[ , mv_mfinanciacion_limite := rowSums( cbind( Master_mfinanciacion_limite,  Visa_mfinanciacion_limite) , na.rm=TRUE ) ]
+
+marzo[ , mv_Fvencimiento         := pmin( Master_Fvencimiento, Visa_Fvencimiento, na.rm = TRUE) ]
+marzo[ , mv_Finiciomora          := pmin( Master_Finiciomora, Visa_Finiciomora, na.rm = TRUE) ]
+marzo[ , mv_msaldototal          := rowSums( cbind( Master_msaldototal,  Visa_msaldototal) , na.rm=TRUE ) ]
+marzo[ , mv_msaldopesos          := rowSums( cbind( Master_msaldopesos,  Visa_msaldopesos) , na.rm=TRUE ) ]
+marzo[ , mv_msaldodolares        := rowSums( cbind( Master_msaldodolares,  Visa_msaldodolares) , na.rm=TRUE ) ]
+marzo[ , mv_mconsumospesos       := rowSums( cbind( Master_mconsumospesos,  Visa_mconsumospesos) , na.rm=TRUE ) ]
+marzo[ , mv_mconsumosdolares     := rowSums( cbind( Master_mconsumosdolares,  Visa_mconsumosdolares) , na.rm=TRUE ) ]
+marzo[ , mv_mlimitecompra        := rowSums( cbind( Master_mlimitecompra,  Visa_mlimitecompra) , na.rm=TRUE ) ]
+marzo[ , mv_madelantopesos       := rowSums( cbind( Master_madelantopesos,  Visa_madelantopesos) , na.rm=TRUE ) ]
+marzo[ , mv_madelantodolares     := rowSums( cbind( Master_madelantodolares,  Visa_madelantodolares) , na.rm=TRUE ) ]
+marzo[ , mv_fultimo_cierre       := pmax( Master_fultimo_cierre, Visa_fultimo_cierre, na.rm = TRUE) ]
+marzo[ , mv_mpagado              := rowSums( cbind( Master_mpagado,  Visa_mpagado) , na.rm=TRUE ) ]
+marzo[ , mv_mpagospesos          := rowSums( cbind( Master_mpagospesos,  Visa_mpagospesos) , na.rm=TRUE ) ]
+marzo[ , mv_mpagosdolares        := rowSums( cbind( Master_mpagosdolares,  Visa_mpagosdolares) , na.rm=TRUE ) ]
+marzo[ , mv_fechaalta            := pmax( Master_fechaalta, Visa_fechaalta, na.rm = TRUE) ]
+marzo[ , mv_mconsumototal        := rowSums( cbind( Master_mconsumototal,  Visa_mconsumototal) , na.rm=TRUE ) ]
+marzo[ , mv_cconsumos            := rowSums( cbind( Master_cconsumos,  Visa_cconsumos) , na.rm=TRUE ) ]
+marzo[ , mv_cadelantosefectivo   := rowSums( cbind( Master_cadelantosefectivo,  Visa_cadelantosefectivo) , na.rm=TRUE ) ]
+marzo[ , mv_mpagominimo          := rowSums( cbind( Master_mpagominimo,  Visa_mpagominimo) , na.rm=TRUE ) ]
+
+#a partir de aqui juego con la suma de Mastercard y Visa
+marzo[ , mvr_Master_mlimitecompra:= Master_mlimitecompra / mv_mlimitecompra ]
+marzo[ , mvr_Visa_mlimitecompra  := Visa_mlimitecompra / mv_mlimitecompra ]
+marzo[ , mvr_msaldototal         := mv_msaldototal / mv_mlimitecompra ]
+marzo[ , mvr_msaldopesos         := mv_msaldopesos / mv_mlimitecompra ]
+marzo[ , mvr_msaldopesos2        := mv_msaldopesos / mv_msaldototal ]
+marzo[ , mvr_msaldodolares       := mv_msaldodolares / mv_mlimitecompra ]
+marzo[ , mvr_msaldodolares2      := mv_msaldodolares / mv_msaldototal ]
+marzo[ , mvr_mconsumospesos      := mv_mconsumospesos / mv_mlimitecompra ]
+marzo[ , mvr_mconsumosdolares    := mv_mconsumosdolares / mv_mlimitecompra ]
+marzo[ , mvr_madelantopesos      := mv_madelantopesos / mv_mlimitecompra ]
+marzo[ , mvr_madelantodolares    := mv_madelantodolares / mv_mlimitecompra ]
+marzo[ , mvr_mpagado             := mv_mpagado / mv_mlimitecompra ]
+marzo[ , mvr_mpagospesos         := mv_mpagospesos / mv_mlimitecompra ]
+marzo[ , mvr_mpagosdolares       := mv_mpagosdolares / mv_mlimitecompra ]
+marzo[ , mvr_mconsumototal       := mv_mconsumototal  / mv_mlimitecompra ]
+marzo[ , mvr_mpagominimo         := mv_mpagominimo  / mv_mlimitecompra ]
+
 set.seed(semillas[1])
 for (i in 1:20)  {
     marzo[, paste0("canarito", i) := runif(nrow(marzo))]

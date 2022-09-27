@@ -34,10 +34,15 @@ options(error = function() {
 hs <- makeParamSet( 
          makeNumericParam("learning_rate",    lower=    0.005, upper=    0.3),
          makeNumericParam("feature_fraction", lower=    0.2  , upper=    1.0),
-         makeIntegerParam("min_data_in_leaf", lower=    0L   , upper=  8000L),
+         makeIntegerParam("min_data_in_leaf", lower=    0L   , upper=  8000L),#lower = 500L
          makeIntegerParam("num_leaves",       lower=   16L   , upper=  1024L),
-         makeIntegerParam("envios",           lower= 5000L   , upper= 15000L)
+         makeIntegerParam("envios",           lower= 5000L   , upper= 15000L)#busca el mejor punto de corte
         )
+#max_bins
+#bagging_fraction: afecta como el extra_trees
+#extra_trees: necesitas más árboles
+#la regularización con los lmabdas puede ayudar a reducir ruido
+#a más parámetros más iteraciones, a partir de 250
 
 #defino los parametros de la corrida, en una lista, la variable global  PARAM
 #  muy pronto esto se leera desde un archivo formato .yaml
