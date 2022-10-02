@@ -52,9 +52,9 @@ hs <- makeParamSet(
 #  muy pronto esto se leera desde un archivo formato .yaml
 PARAM  <- list()
 
-PARAM$experimento  <- "HT7233"
+PARAM$experimento  <- "HT7234"
 
-PARAM$input$dataset       <- "./exp/FE7111/dataset_7111.csv.gz"
+PARAM$input$dataset       <- "./exp/FE7112/dataset_7112.csv.gz"
 PARAM$input$training      <- c( 202103 )
 
 PARAM$trainingstrategy$undersampling  <-  1.0   # un undersampling de 0.1  toma solo el 10% de los CONTINUA
