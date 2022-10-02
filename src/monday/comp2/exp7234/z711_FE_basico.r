@@ -20,17 +20,17 @@ options(error = function() {
 
 
 
-#setwd( "~/buckets/b1/" )
-setwd(gsub(" ", "", paste(gsub('/', '\\\\', gsub("/m_d_m/dmef", "", getwd())), "\\m_d_m\\dmef")))
+setwd( "~/buckets/b1/" )
+#setwd(gsub(" ", "", paste(gsub('/', '\\\\', gsub("/m_d_m/dmef", "", getwd())), "\\m_d_m\\dmef")))
 
 #cargo el dataset
 dataset  <- fread( "./datasets/competencia2_2022.csv.gz")
 
 #creo la carpeta donde va el experimento
 # FE  representa  Feature Engineering
-#dir.create( "./exp/",  showWarnings = FALSE ) 
-#dir.create( "./exp/FE7112/", showWarnings = FALSE )
-#setwd("./exp/FE7112/")   #Establezco el Working Directory DEL EXPERIMENTO
+dir.create( "./exp/",  showWarnings = FALSE ) 
+dir.create( "./exp/FE7112/", showWarnings = FALSE )
+setwd("./exp/FE7112/")   #Establezco el Working Directory DEL EXPERIMENTO
 
 #INICIO de la seccion donde se deben hacer cambios con variables nuevas
 
@@ -111,7 +111,8 @@ mis_variables <- c("ctrx_quarter",
                    "mcuenta_corriente")
 prefix <- "r_"
 for (var in mis_variables) {
-  dataset[, (paste(prefix, var, sep = "")) := ntile(get(var), 10)]
+  dataset[foto_mes == 202103, (paste(prefix, var, sep = "")) := ntile(get(var), 10)]
+  dataset[foto_mes == 202105, (paste(prefix, var, sep = "")) := ntile(get(var), 10)]
 }
 
 #interacción de variables
@@ -166,8 +167,8 @@ if( nans_qty > 0 )
 
 #--------------------------------------
 #grabo el dataset
-#fwrite( dataset,
-#        "dataset_7112.csv.gz",
-#        logical01= TRUE,
-#        sep= "," )
+fwrite( dataset,
+        "dataset_7112.csv.gz",
+        logical01= TRUE,
+        sep= "," )
 
