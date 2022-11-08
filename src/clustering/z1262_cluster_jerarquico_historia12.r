@@ -24,7 +24,8 @@ PARAM$experimento  <- "CLU1262"
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
 
-setwd( "~/buckets/b1/" )  #cambiar por la carpeta local
+#setwd( "~/buckets/b1/" ) 
+setwd(gsub(" ", "", paste(gsub('/', '\\\\', gsub("/m_d_m/dmef", "", getwd())), "\\m_d_m\\dmef")))
 
 #leo el dataset original
 # pero podria leer cualquiera que tenga Feature Engineering
@@ -91,7 +92,7 @@ dev.off()
 h <- 20
 distintos <- 0
 
-while(  h>0  &  !( distintos >=6 & distintos <=7 ) )
+while(  h>0  &  !( distintos >=4 & distintos <=5 ) )
 {
   h <- h - 1 
   rf.cluster  <- cutree( hclust.rf, h)
