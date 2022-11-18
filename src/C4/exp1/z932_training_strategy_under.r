@@ -33,8 +33,8 @@ PARAM$train$sampling_total  <- 1.0  # 1.0 significa que NO se hace sampling tota
 PARAM$train$undersampling_mayoritaria  <- 0.4   # 1.0 significa NO undersampling ,  0.1  es quedarse con el 10% de los CONTINUA
 
 #Atencion, las semillas deben ser distintas
-PARAM$train$semilla_sampling  <- 102191
-PARAM$train$semilla_under     <- 892237
+PARAM$train$semilla_sampling  <- 309367
+PARAM$train$semilla_under     <- 690467
 # FIN Parametros del script
 
 
