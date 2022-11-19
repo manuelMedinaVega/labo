@@ -16,8 +16,8 @@ require("primes")
 
 #Parametros del script
 PARAM <- list()
-PARAM$experimento <- "ZZ9430"
-PARAM$exp_input <- "HT9430"
+PARAM$experimento <- "ZZ9432"
+PARAM$exp_input <- "HT9432"
 
 # PARAM$modelos  <- 2
 PARAM$modelo <- 1 # se usa el mejor de la OB, pero a futuro podria variar esto
