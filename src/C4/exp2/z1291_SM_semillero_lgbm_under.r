@@ -16,12 +16,12 @@ require("primes")
 
 #Parametros del script
 PARAM <- list()
-PARAM$experimento <- "ZZ9430"
-PARAM$exp_input <- "HT9430"
+PARAM$experimento <- "ZZ9431"
+PARAM$exp_input <- "HT9431"
 
 # PARAM$modelos  <- 2
 PARAM$modelo <- 1 # se usa el mejor de la OB, pero a futuro podria variar esto
-PARAM$semilla_primos <- 309367
+PARAM$semilla_primos <- 795931
 PARAM$semillerio <- 40 # ¿De cuanto será nuestro semillerio?
 PARAM$indice_inicio_semilla <- 1
 PARAM$indice_fin_semilla <- 20
