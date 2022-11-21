@@ -6,12 +6,12 @@ require("data.table")
 
 # Parametros del script
 PARAM <- list()
-PARAM$experimento <- "ZZ1292_ensamble_semillerio"
-PARAM$exp_input <- "ZZ9430"
+PARAM$experimento <- "ZZ1294_ensamble_semillerio"
+PARAM$exp_input <- "ZZ9432"
 
 #PARAM$corte <- 11000 # cantidad de envios
 PARAM$cortes  <- seq( from=  7000,
-                      to=    13000,
+                      to=    15000,
                       by=        500 )
 # FIN Parametros del script
 
@@ -67,7 +67,7 @@ for (archivo in archivos) {
 
 for (corte in PARAM$cortes)
 {
-  nom_corte_sem = paste0("semillerio_",sprintf("%d", corte))
+  nom_corte_sem = paste0("semillerio_",sprintf("%d", corte),".csv")
   tb_prediccion_semillerio[, Predicted := 0]
   tb_prediccion_semillerio[1:corte, Predicted := 1L]
   # Guardo el submit con rank

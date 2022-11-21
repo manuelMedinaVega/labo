@@ -67,7 +67,7 @@ for (archivo in archivos) {
 
 for (corte in PARAM$cortes)
 {
-  nom_corte_sem = paste0("semillerio_",sprintf("%d", corte))
+  nom_corte_sem = paste0("semillerio_",sprintf("%d", corte),".csv")
   tb_prediccion_semillerio[, Predicted := 0]
   tb_prediccion_semillerio[1:corte, Predicted := 1L]
   # Guardo el submit con rank
