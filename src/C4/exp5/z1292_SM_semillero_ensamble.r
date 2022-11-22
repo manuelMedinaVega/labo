@@ -6,8 +6,9 @@ require("data.table")
 
 # Parametros del script
 PARAM <- list()
-PARAM$experimento <- "ZZ1292_ensamble_semillerio"
-PARAM$exp_input <- "ZZ9430"
+PARAM$experimento <- "ZZ1296_ensamble_semillerio"
+PARAM$exp_input <- "ZZ9434"
+PARAM$resultados_semillerios <- "resultados_semillerios"
 
 #PARAM$corte <- 11000 # cantidad de envios
 PARAM$cortes  <- seq( from=  7000,
@@ -60,10 +61,12 @@ for (archivo in archivos) {
     tb_ranking_semillerio[, list(numero_de_cliente)],
     prediccion = rowMeans(tb_ranking_semillerio[, c(-1)]) # excluye el numero_de_cliente del cálculo de la media
   )
-  setorder(tb_prediccion_semillerio, prediccion) # Esto es un ranking, entonces de menor a mayor
   
 }
 
+tb_prediccion_final <- tb_prediccion_semillerio[, list(numero_de_cliente, prediccion)]
+
+setorder(tb_prediccion_semillerio, prediccion) # Esto es un ranking, entonces de menor a mayor
 
 for (corte in PARAM$cortes)
 {
@@ -76,3 +79,9 @@ for (corte in PARAM$cortes)
          sep = ",")
 }
 
+dir.create(paste0(base_dir, "exp/", PARAM$resultados_semillerios, "/"), showWarnings = FALSE)
+setwd(paste0(base_dir, "exp/", PARAM$resultados_semillerios, "/")) # Establezco el Working Directory DEL EXPERIMENTO
+nom_resultados = paste0("resultados_", PARAM$experimento, ".csv")
+fwrite(tb_prediccion_final[, list(numero_de_cliente, prediccion)],
+       file = nom_resultados,
+       sep = ",")
