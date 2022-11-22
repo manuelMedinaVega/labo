@@ -21,6 +21,7 @@ options(error = function() {
 
 base_dir <- "~/buckets/b1/"
 
+dir.create(paste0(base_dir, "exp/", PARAM$experimento, "/"), showWarnings = FALSE)
 setwd(paste0(base_dir, "exp/", PARAM$experimento, "/")) # Establezco el Working Directory DEL EXPERIMENTO
 
 path_resultados <- paste0(base_dir, "exp/", PARAM$exp_input)
@@ -42,7 +43,7 @@ for (archivo in archivos) {
   # cols: numero_de_cliente,foto_mes,prob,rank
   tb_prediccion <- fread(paste0(path_resultados, '/', archivo))
   
-  tb_ranking_semillerio[, archivo := tb_prediccion$prediccion]
+  tb_ranking_semillerio[, sub(".csv", "", archivo) := tb_prediccion$prediccion]
   
   # Esta es la predicción del semillerio para la semilla i-esima
   tb_prediccion_final <- data.table(
