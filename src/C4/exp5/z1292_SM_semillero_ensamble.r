@@ -81,7 +81,7 @@ for (corte in PARAM$cortes)
 
 dir.create(paste0(base_dir, "exp/", PARAM$resultados_semillerios, "/"), showWarnings = FALSE)
 setwd(paste0(base_dir, "exp/", PARAM$resultados_semillerios, "/")) # Establezco el Working Directory DEL EXPERIMENTO
-nom_resultados = paste0("resultados_", PARAM$experimento, ".csv")
+nom_resultados <- paste0("resultados_", PARAM$experimento, ".csv")
 fwrite(tb_prediccion_final[, list(numero_de_cliente, prediccion)],
        file = nom_resultados,
        sep = ",")
