@@ -22,9 +22,9 @@ PARAM$exp_input <- "HT9433"
 # PARAM$modelos  <- 2
 PARAM$modelo <- 1 # se usa el mejor de la OB, pero a futuro podria variar esto
 PARAM$semilla_primos <- 699191
-PARAM$semillerio <- 50 # ¿De cuanto será nuestro semillerio?
+PARAM$semillerio <- 40 # ¿De cuanto será nuestro semillerio?
 PARAM$indice_inicio_semilla <- 1
-PARAM$indice_fin_semilla <- 25
+PARAM$indice_fin_semilla <- 20
 # FIN Parametros del script
 
 # genero un vector de una cantidad de PARAM$semillerio  de semillas,  buscando numeros primos al azar
