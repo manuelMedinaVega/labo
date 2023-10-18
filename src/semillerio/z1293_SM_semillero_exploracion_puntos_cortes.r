@@ -6,13 +6,13 @@ require("data.table")
 
 # Parametros del script
 PARAM <- list()
-PARAM$experimento <- "ZZ1292_ganancias_semillerio_ppc_50"
+PARAM$experimento <- "ZZ1292_ganancias_semillerio"
 PARAM$exp_input <- "ZZ9410_semillerio"
 
 #PARAM$corte <- 11000 # cantidad de envios
-PARAM$cortes  <- seq( from=  9000,
-                      to=    12000,
-                      by=        500 )
+PARAM$cortes  <- seq( from=  7000,
+                      to=    14000,
+                      by=        250 )
 # FIN Parametros del script
 
 options(error = function() {
@@ -68,6 +68,9 @@ for (archivo in archivos) {
   
   # cols: numero_de_cliente,foto_mes,prob,rank
   tb_prediccion <- fread(paste0(path_experimento_semillerio, '/', archivo))
+  setorder(tb_prediccion, numero_de_cliente)
+  setorder(tb_ranking_semillerio, numero_de_cliente)
+
   # repara bug en z1292, si se fixea ahi, esto no genera problemas
   tb_prediccion[, rank := frank(-prob, ties.method = "random")]
   
@@ -129,6 +132,10 @@ for (corte in PARAM$cortes)
          fill = c("red", "green", "blue"),
          horiz = FALSE
   )
+
+  message(" Pto Corte : ", corte, " -  Dif entre semilla e avg ind: ", max(tb_ganancias[, get(nom_corte_sem)]) - mean_gan_ind )
+  message(" Pto Corte : ", corte, " -  Dif entre min semilla e avg ind: ", min(tb_ganancias[, get(nom_corte_sem)]) - mean_gan_ind )
+
 }
 
 
